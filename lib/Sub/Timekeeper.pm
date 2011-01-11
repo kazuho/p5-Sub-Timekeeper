@@ -3,9 +3,12 @@ package Sub::Timekeeper;
 use strict;
 use warnings;
 
-use Exporter qw(import);
+require Exporter;
 use Time::HiRes ();
 
+our $VERSION = '0.01';
+
+our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(timekeeper);
 our %EXPORT_TAGS = (
     all => [ @EXPORT_OK ],
