@@ -1,0 +1,30 @@
+NAME
+    Sub::Timekeeper - calls a function with a stopwatch
+
+SYNOPSIS
+        use Sub::Timekeeper qw(timekeeper);
+
+        my $val = timekeeper(my $timeout, sub {
+            ...
+            return $retval;
+        });
+
+        my @arr = timekeeper(my $timeout, sub {
+            ...
+            return @retarr;
+        });
+
+DESCRIPTION
+    The module exports the "timekeeper" function, that can be used to
+    measure the time spent to execute a function. The timeout is set to the
+    first argument in seconds (as a floating point value).
+
+AUTHOR
+    Kazuho Oku
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+
