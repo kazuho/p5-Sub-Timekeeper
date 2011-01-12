@@ -1,5 +1,7 @@
 package Sub::Timekeeper;
 
+use 5.008_001;
+
 use strict;
 use warnings;
 
