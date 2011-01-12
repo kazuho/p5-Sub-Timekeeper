@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 9;
 
 use strict;
 use warnings;
@@ -22,5 +22,11 @@ my @r = timekeeper(undef, sub { 111 });
 is_deeply \@r, [111], 'wantarray and scalar';
 @r = timekeeper(undef, sub { (11, 22, 33) });
 is_deeply \@r, [11, 22, 33], 'wantarray';
+
+eval {
+    timekeeper($elapsed, sub { Time::HiRes::sleep(0.5); die "aaa" });
+};
+like $@, qr/^aaa/, 'got exception';
+ok 0.4 <= $elapsed && $elapsed <= 0.6, "duration on execption : $elapsed";
 
 done_testing;

@@ -17,18 +17,23 @@ our %EXPORT_TAGS = (
 );
 
 sub timekeeper {
-    my $elapsed = \$_[0]; shift;
+    my $guard = Sub::Timekeeper::Guard->new(\$_[0]); shift;
     my $subref = shift;
-    
-    my $start = Time::HiRes::time;
-    if (wantarray) {
-        my @r = $subref->(@_);
-        $$elapsed = Time::HiRes::time - $start;
-        return @r;
-    } else {
-        my $r = $subref->(@_);
-        $$elapsed = Time::HiRes::time - $start;
-        return $r;
+
+    return $subref->(@_);
+}
+
+# utility class
+{
+    package # hide from pause
+        Sub::Timekeeper::Guard;
+    sub new {
+        my ($klass, $elapsed) = @_;
+        bless [ $elapsed, Time::HiRes::time ], $klass;
+    }
+    sub DESTROY {
+        my $self = shift;
+        ${$self->[0]} = Time::HiRes::time - $self->[1];
     }
 }
 
@@ -43,19 +48,31 @@ Sub::Timekeeper - calls a function with a stopwatch
 
     use Sub::Timekeeper qw(timekeeper);
 
-    my $val = timekeeper(my $timeout, sub {
+    my $val = timekeeper(my $elapsed, sub {
         ...
         return $retval;
     });
 
-    my @arr = timekeeper(my $timeout, sub {
+    my @arr = timekeeper(my $elapsed, sub {
         ...
         return @retarr;
     });
 
 =head1 DESCRIPTION
 
-The module exports the C<timekeeper> function, that can be used to measure the time spent to execute a function.  The timeout is set to the first argument in seconds (as a floating point value).
+The module exports the C<timekeeper> function, that can be used to measure the time spent to execute a function.  The duration is set to the first argument in seconds (as a floating point value).
+
+The duration is set regardless of whether the called function returned normally or by an exception.  In other words the following snippet will report the correct duration.
+
+    my $elapsed;
+    eval {
+        timekeeper($elapsed, sub {
+            ...
+        }
+    };
+    if ($@) {
+        warn "got error $@ after $elapsed seconds";
+    }
 
 =head1 AUTHOR
 
